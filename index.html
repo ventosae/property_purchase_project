@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Инвестиционный проект: Мельбурн</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #e2e8f0;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #10b981;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #10b981;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.38s ease;
+    }
+    .accordion-content.open {
+      max-height: 600px;
+    }
+
+    .accordion-icon {
+      transition: transform 0.3s ease;
+    }
+    .accordion-icon.rotated {
+      transform: rotate(180deg);
+    }
+  </style>
+</head>
+<body class="font-sans bg-white text-slate-800 antialiased">
+
+<!-- ══════════════════════════════════════════
+     PASSWORD OVERLAY
+══════════════════════════════════════════ -->
+<div id="pwd-overlay" class="fixed inset-0 z-50 bg-slate-900 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center">
+    <div class="flex justify-center mb-5">
+      <div class="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
+        <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        </svg>
+      </div>
+    </div>
+    <h2 id="pwd-title" data-i18n="pwd-title" class="text-xl font-bold text-slate-900 mb-1"></h2>
+    <p id="pwd-subtitle" data-i18n="pwd-subtitle" class="text-slate-400 text-sm mb-6"></p>
+    <input id="pwd-input" type="password" placeholder="••••••••••••"
+      class="w-full border border-slate-200 rounded-xl px-4 py-3 text-center text-slate-900 text-lg tracking-widest
+             focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent mb-3 transition">
+    <div id="pwd-error" data-i18n="pwd-error" class="text-red-500 text-sm mb-3 hidden"></div>
+    <button onclick="checkPassword()"
+      class="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold py-3 rounded-xl
+             transition-colors shadow-sm">
+      <span id="pwd-btn-text" data-i18n="pwd-btn-text"></span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     LANGUAGE TOGGLE (fixed)
+══════════════════════════════════════════ -->
+<div class="fixed top-4 right-4 z-[60] flex bg-white/95 backdrop-blur rounded-full shadow-lg border border-slate-100 p-1 gap-1">
+  <button id="btn-ru" onclick="setLang('ru')"
+    class="px-3 py-1.5 rounded-full text-sm font-bold transition-all bg-emerald-500 text-white">
+    РУ
+  </button>
+  <button id="btn-en" onclick="setLang('en')"
+    class="px-3 py-1.5 rounded-full text-sm font-bold transition-all text-slate-500 hover:text-slate-800">
+    EN
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════════ -->
+<main id="main" class="hidden">
+
+  <!-- ── SECTION 1: HERO ────────────────── -->
+  <section id="hero" class="bg-slate-900 text-white py-24 px-4 md:px-8 lg:px-12">
+    <div class="max-w-4xl mx-auto fade-in">
+      <div class="inline-flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/25 text-emerald-400
+                  text-xs font-semibold px-4 py-1.5 rounded-full mb-8 uppercase tracking-wider">
+        <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse inline-block"></span>
+        <span data-i18n="hero-badge"></span>
+      </div>
+      <h1 data-i18n="hero-title"
+        class="text-3xl md:text-5xl font-extrabold mb-8 leading-tight tracking-tight"></h1>
+      <div data-i18n="hero-body"
+        class="text-slate-300 text-base md:text-lg leading-relaxed space-y-5 max-w-3xl"></div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 2: SUBURBS ─────────────── -->
+  <section id="suburbs" class="bg-white py-20 px-4 md:px-8 lg:px-12">
+    <div class="max-w-5xl mx-auto">
+
+      <div class="text-center mb-12 fade-in">
+        <h2 data-i18n="suburbs-title"
+          class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-3"></h2>
+        <p data-i18n="suburbs-intro"
+          class="text-slate-500 max-w-2xl mx-auto text-base leading-relaxed"></p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-6 fade-in">
+        <!-- Preston -->
+        <div class="border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900">Preston</h3>
+          </div>
+          <div data-i18n="suburb-preston" class="text-slate-600 text-sm leading-relaxed space-y-2"></div>
+        </div>
+
+        <!-- North Melbourne -->
+        <div class="border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900">North Melbourne</h3>
+          </div>
+          <div data-i18n="suburb-northmelb" class="text-slate-600 text-sm leading-relaxed space-y-2"></div>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 rounded-2xl p-5 mb-5 fade-in">
+        <p data-i18n="suburbs-also" class="text-slate-600 text-sm"></p>
+      </div>
+
+      <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 fade-in">
+        <h4 data-i18n="suburbs-principle-title" class="font-bold text-emerald-800 mb-2 text-sm uppercase tracking-wide"></h4>
+        <p data-i18n="suburbs-principle-body" class="text-emerald-700 text-sm leading-relaxed"></p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── SECTION 3: MARKET EXPLAINER ───── -->
+  <section id="market" class="bg-slate-50 py-20 px-4 md:px-8 lg:px-12">
+    <div class="max-w-3xl mx-auto">
+
+      <div class="text-center mb-10 fade-in">
+        <h2 data-i18n="market-title"
+          class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-3"></h2>
+        <p data-i18n="market-subtitle" class="text-slate-500"></p>
+      </div>
+
+      <div class="space-y-3 fade-in">
+
+        <!-- 3a: Property types -->
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <button onclick="toggleAccordion('acc-1')"
+            class="w-full flex items-center justify-between px-6 py-5 text-left group">
+            <span data-i18n="acc1-title" class="font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors"></span>
+            <svg id="acc-1-icon" class="accordion-icon w-5 h-5 text-slate-400 flex-shrink-0 ml-4"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div id="acc-1" class="accordion-content">
+            <div data-i18n="acc1-body" class="px-6 pb-5 text-slate-600 text-sm leading-relaxed"></div>
+          </div>
+        </div>
+
+        <!-- 3b: Stamp duty -->
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <button onclick="toggleAccordion('acc-2')"
+            class="w-full flex items-center justify-between px-6 py-5 text-left group">
+            <span data-i18n="acc2-title" class="font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors"></span>
+            <svg id="acc-2-icon" class="accordion-icon w-5 h-5 text-slate-400 flex-shrink-0 ml-4"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div id="acc-2" class="accordion-content">
+            <div data-i18n="acc2-body" class="px-6 pb-5 text-slate-600 text-sm leading-relaxed"></div>
+          </div>
+        </div>
+
+        <!-- 3c: First Home Guarantee -->
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <button onclick="toggleAccordion('acc-3')"
+            class="w-full flex items-center justify-between px-6 py-5 text-left group">
+            <span data-i18n="acc3-title" class="font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors"></span>
+            <svg id="acc-3-icon" class="accordion-icon w-5 h-5 text-slate-400 flex-shrink-0 ml-4"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div id="acc-3" class="accordion-content">
+            <div data-i18n="acc3-body" class="px-6 pb-5 text-slate-600 text-sm leading-relaxed"></div>
+          </div>
+        </div>
+
+        <!-- 3d: Offset account -->
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <button onclick="toggleAccordion('acc-4')"
+            class="w-full flex items-center justify-between px-6 py-5 text-left group">
+            <span data-i18n="acc4-title" class="font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors"></span>
+            <svg id="acc-4-icon" class="accordion-icon w-5 h-5 text-slate-400 flex-shrink-0 ml-4"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div id="acc-4" class="accordion-content">
+            <div data-i18n="acc4-body" class="px-6 pb-5 text-slate-600 text-sm leading-relaxed"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 4: MONEY TRANSFER ─────── -->
+  <section id="transfer" class="bg-white py-20 px-4 md:px-8 lg:px-12">
+    <div class="max-w-3xl mx-auto">
+
+      <div class="fade-in bg-amber-50 border border-amber-200 rounded-xl px-5 py-3.5 mb-10 flex items-center gap-3">
+        <svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <span data-i18n="transfer-banner" class="text-amber-700 text-sm font-medium"></span>
+      </div>
+
+      <div class="fade-in">
+        <h2 data-i18n="transfer-title"
+          class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-8"></h2>
+        <div data-i18n="transfer-body"
+          class="text-slate-600 leading-relaxed space-y-5 text-sm md:text-base"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── SECTION 5: PLAN + SCENARIOS ───── -->
+  <section id="scenarios" class="bg-slate-50 py-20 px-4 md:px-8 lg:px-12">
+    <div class="max-w-5xl mx-auto">
+
+      <!-- Plan summary -->
+      <div class="fade-in mb-14">
+        <h2 data-i18n="plan-title"
+          class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-8 text-center"></h2>
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 md:p-8 max-w-lg mx-auto">
+          <div data-i18n="plan-body"></div>
+        </div>
+      </div>
+
+      <!-- Scenario cards -->
+      <div class="fade-in">
+        <h3 data-i18n="scenarios-heading"
+          class="text-xl font-extrabold text-slate-900 mb-6 text-center"></h3>
+        <div class="grid md:grid-cols-3 gap-5">
+
+          <div class="bg-white rounded-2xl shadow-sm border-t-4 border-red-500 overflow-hidden flex flex-col">
+            <div class="bg-red-50 px-6 py-4">
+              <h4 data-i18n="sc-worst-title" class="font-bold text-red-700 text-base"></h4>
+            </div>
+            <div data-i18n="sc-worst-body" class="px-6 py-5 text-slate-600 text-sm space-y-2 flex-1"></div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm border-t-4 border-amber-500 overflow-hidden flex flex-col">
+            <div class="bg-amber-50 px-6 py-4">
+              <h4 data-i18n="sc-real-title" class="font-bold text-amber-700 text-base"></h4>
+            </div>
+            <div data-i18n="sc-real-body" class="px-6 py-5 text-slate-600 text-sm space-y-2 flex-1"></div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm border-t-4 border-emerald-500 overflow-hidden flex flex-col">
+            <div class="bg-emerald-50 px-6 py-4">
+              <h4 data-i18n="sc-best-title" class="font-bold text-emerald-700 text-base"></h4>
+            </div>
+            <div data-i18n="sc-best-body" class="px-6 py-5 text-slate-600 text-sm space-y-2 flex-1"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── SECTION 6: CALCULATOR ──────────── -->
+  <section id="calculator" class="bg-white py-20 px-4 md:px-8 lg:px-12">
+    <div class="max-w-4xl mx-auto">
+
+      <div class="text-center mb-10 fade-in">
+        <h2 data-i18n="calc-title"
+          class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-3"></h2>
+        <p data-i18n="calc-subtitle" class="text-slate-500"></p>
+      </div>
+
+      <!-- Sliders -->
+      <div class="fade-in bg-slate-50 rounded-2xl p-6 md:p-8 mb-6">
+        <div class="grid md:grid-cols-2 gap-x-8 gap-y-6">
+
+          <div>
+            <div class="flex justify-between items-baseline mb-2">
+              <label data-i18n="sl1-label" class="text-sm font-medium text-slate-600"></label>
+              <span id="sl1-val" class="text-sm font-bold text-emerald-600 tabular-nums"></span>
+            </div>
+            <input type="range" id="sl1" min="50000" max="350000" step="10000" value="200000" oninput="updateCalc()">
+          </div>
+
+          <div>
+            <div class="flex justify-between items-baseline mb-2">
+              <label data-i18n="sl2-label" class="text-sm font-medium text-slate-600"></label>
+              <span id="sl2-val" class="text-sm font-bold text-emerald-600 tabular-nums"></span>
+            </div>
+            <input type="range" id="sl2" min="2" max="10" step="0.5" value="5" oninput="updateCalc()">
+          </div>
+
+          <div>
+            <div class="flex justify-between items-baseline mb-2">
+              <label data-i18n="sl3-label" class="text-sm font-medium text-slate-600"></label>
+              <span id="sl3-val" class="text-sm font-bold text-emerald-600 tabular-nums"></span>
+            </div>
+            <input type="range" id="sl3" min="300000" max="600000" step="10000" value="450000" oninput="updateCalc()">
+          </div>
+
+          <div>
+            <div class="flex justify-between items-baseline mb-2">
+              <label data-i18n="sl4-label" class="text-sm font-medium text-slate-600"></label>
+              <span id="sl4-val" class="text-sm font-bold text-emerald-600 tabular-nums"></span>
+            </div>
+            <input type="range" id="sl4" min="20000" max="80000" step="5000" value="50000" oninput="updateCalc()">
+          </div>
+
+          <div>
+            <div class="flex justify-between items-baseline mb-2">
+              <label data-i18n="sl5-label" class="text-sm font-medium text-slate-600"></label>
+              <span id="sl5-val" class="text-sm font-bold text-emerald-600 tabular-nums"></span>
+            </div>
+            <input type="range" id="sl5" min="4.0" max="8.0" step="0.1" value="6.0" oninput="updateCalc()">
+          </div>
+
+          <div>
+            <div class="flex justify-between items-baseline mb-2">
+              <label data-i18n="sl6-label" class="text-sm font-medium text-slate-600"></label>
+              <span id="sl6-val" class="text-sm font-bold text-emerald-600 tabular-nums"></span>
+            </div>
+            <input type="range" id="sl6" min="5" max="30" step="1" value="15" oninput="updateCalc()">
+          </div>
+
+          <div class="md:col-span-2">
+            <div class="flex justify-between items-baseline mb-2">
+              <label data-i18n="sl7-label" class="text-sm font-medium text-slate-600"></label>
+              <span id="sl7-val" class="text-sm font-bold text-emerald-600 tabular-nums"></span>
+            </div>
+            <input type="range" id="sl7" min="0" max="150000" step="5000" value="0" oninput="updateCalc()">
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Output metrics grid -->
+      <div class="fade-in grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
+
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p data-i18n="out1-label" class="text-xs text-slate-400 mb-1 leading-tight"></p>
+          <p id="out1" class="text-base font-bold text-red-500 tabular-nums"></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p data-i18n="out2-label" class="text-xs text-slate-400 mb-1 leading-tight"></p>
+          <p id="out2" class="text-base font-bold text-slate-800 tabular-nums"></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p data-i18n="out3-label" class="text-xs text-slate-400 mb-1 leading-tight"></p>
+          <p id="out3" class="text-base font-bold text-slate-800 tabular-nums"></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p data-i18n="out4-label" class="text-xs text-slate-400 mb-1 leading-tight"></p>
+          <p id="out4" class="text-base font-bold text-slate-800 tabular-nums"></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p data-i18n="out5-label" class="text-xs text-slate-400 mb-1 leading-tight"></p>
+          <p id="out5" class="text-base font-bold text-slate-800 tabular-nums"></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p data-i18n="out6-label" class="text-xs text-slate-400 mb-1 leading-tight"></p>
+          <p id="out6" class="text-base font-bold text-emerald-600 tabular-nums"></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p data-i18n="out7-label" class="text-xs text-slate-400 mb-1 leading-tight"></p>
+          <p id="out7" class="text-base font-bold text-slate-800 tabular-nums"></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4 col-span-1">
+          <p data-i18n="out8-label" class="text-xs text-slate-400 mb-1 leading-tight"></p>
+          <p id="out8" class="text-xl font-extrabold tabular-nums"></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4 col-span-1">
+          <p data-i18n="out9-label" class="text-xs text-slate-400 mb-1 leading-tight"></p>
+          <p id="out9" class="text-xl font-extrabold tabular-nums"></p>
+        </div>
+
+      </div>
+
+      <!-- Verdict -->
+      <div class="fade-in rounded-2xl p-6 text-center border-l-4 bg-slate-50 border-slate-300" id="verdict-box">
+        <p id="verdict-text" class="font-semibold text-lg text-slate-700"></p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── SECTION 7: TIMELINE ────────────── -->
+  <section id="timeline" class="bg-slate-50 py-20 px-4 md:px-8 lg:px-12">
+    <div class="max-w-2xl mx-auto">
+
+      <div class="text-center mb-12 fade-in">
+        <h2 data-i18n="tl-title"
+          class="text-2xl md:text-3xl font-extrabold text-slate-900"></h2>
+      </div>
+
+      <div class="relative fade-in">
+        <div class="absolute left-5 top-2 bottom-2 w-0.5 bg-slate-200 rounded-full"></div>
+        <div id="timeline-items" class="space-y-6"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── FOOTER ─────────────────────────── -->
+  <footer class="bg-slate-900 text-slate-500 py-8 px-4 text-center text-sm">
+    <p data-i18n="footer-text"></p>
+  </footer>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// i18n CONTENT
+// ══════════════════════════════════════════════════════════
+
+const i18n = {
+  ru: {
+    // Password overlay
+    'pwd-title':    'Введите пароль',
+    'pwd-subtitle': 'Эта страница защищена паролем',
+    'pwd-btn-text': 'Войти',
+    'pwd-error':    'Неверный пароль',
+
+    // Hero
+    'hero-badge': 'Закрытый проект',
+    'hero-title': 'Инвестиционный проект:<br>Недвижимость в Мельбурне',
+    'hero-body': `
+      <p>Привет! Это закрытая страница нашего инвестиционного проекта.</p>
+      <p>Сейчас я нахожусь в уникальной позиции. Я работаю как специалист по данным (дата-сайентист) в Мельбурне со стабильной зарплатой около $160,000 в год — это крепкий средний класс Австралии. У меня хорошая кредитная история и высокие шансы получить ипотечный кредит на выгодных условиях. Такая возможность есть не у всех — и ею нужно воспользоваться.</p>
+      <p><strong class="text-white">Почему именно сейчас?</strong></p>
+      <p>Рынок недвижимости Мельбурна находится на переломном моменте. Квартиры здесь не росли в цене почти 10 лет — а значит, они сейчас недооценены. При этом население города растёт быстрее всех в Австралии (130,000 новых жителей в год), а новых квартир строится в 4 раза меньше, чем нужно. Аналитики прогнозируют рост цен на квартиры на 7% в 2026 году и до 28% к 2030 году.</p>
+      <p><strong class="text-white">Что это даёт в итоге?</strong></p>
+      <p>Мы покупаем актив стоимостью $400,000–$500,000 — это капитал почти в полмиллиона австралийских долларов. Когда ипотека выплачена, квартира приносит стабильный пассивный доход от аренды — около 100,000 рублей в месяц (валовый доход при текущем курсе). А стоимость самой квартиры продолжает расти.</p>
+      <p><strong class="text-white">Почему Австралия — это надёжно?</strong></p>
+      <p>Австралия — одна из самых стабильных экономик мира. Страна не знала рецессии 30 лет подряд. Сильная правовая система защищает права собственности. Австралийский доллар — свободно конвертируемая валюта. Недвижимость здесь — это безопасная гавань для капитала, особенно в текущей геополитической ситуации.</p>
+    `,
+
+    // Suburbs
+    'suburbs-title': 'Почему именно Престон и Норт Мельбурн?',
+    'suburbs-intro': 'Мы не берём квартиру в центре города или в небоскрёбе — там переизбыток предложения и слабый рост цен. Вместо этого мы целимся в северные пригороды среднего кольца — районы, которые активно развиваются.',
+    'suburb-preston': `
+      <p>📍 9 км от центра города, отличный транспорт</p>
+      <p>🏘️ Эпицентр «джентрификации» — район быстро преображается: новые кафе, рестораны, молодые профессионалы переезжают сюда</p>
+      <p>🚇 Масштабная модернизация инфраструктуры: 4 железнодорожных переезда убраны, построены 2 новые станции</p>
+      <p>🏗️ Перестройка рынка Престона: проект на 1,200 новых квартир, который изменит район</p>
+      <p>💰 Квартиры с 2 спальнями: $420,000–$535,000</p>
+      <p>📈 Доходность от аренды: 4.7–4.9%</p>
+    `,
+    'suburb-northmelb': `
+      <p>📍 Всего 3 км от центра города</p>
+      <p>🚇 Строится станция нового метро-тоннеля — это резко повысит привлекательность района</p>
+      <p>🎓 Рядом университеты, больницы, парки</p>
+      <p>📈 Рост спроса на аренду со стороны студентов и молодых профессионалов</p>
+    `,
+    'suburbs-also': '📍 Также рассматриваются: Резервуар (12 км — самый доступный) и Кобург (8 км — самая низкая вакантность 0.9%).',
+    'suburbs-principle-title': 'Принцип выбора квартиры',
+    'suburbs-principle-body': 'Старая (1960–1980х), кирпичная, в маленьком доме на 4–12 квартир, с парковкой. НЕ новостройка, НЕ высотка, НЕ большой комплекс. Такие квартиры исторически растут в цене на 5.9–7.4% в год — значительно лучше новых башен.',
+
+    // Market accordion
+    'market-title':    'Как устроен австралийский рынок',
+    'market-subtitle': 'Ключевые понятия, которые важно понять перед инвестицией',
+    'acc1-title': '🏠 Типы жилья',
+    'acc1-body': 'В Австралии основные типы жилья — дом, таунхаус и квартира. Для нашего бюджета мы смотрим на квартиры с 2 спальнями. Квартиры имеют ежегодные общедомовые расходы (страта-сборы) на содержание здания: $3,000–$7,000 в год. Чем меньше и проще дом — тем ниже расходы. Старые кирпичные дома без лифтов и бассейнов обходятся дешевле всего.',
+    'acc2-title': '💸 Гербовый сбор и льготы для первого покупателя',
+    'acc2-body': 'Гербовый сбор — это государственный налог при покупке. Обычно это десятки тысяч долларов. Но как первый покупатель жилья в Австралии, при покупке до $600,000 — этот налог <strong>НОЛЬ</strong>. Экономия: $15,000–$25,000. Условие: нужно прожить в квартире 12 месяцев как основное жильё.',
+    'acc3-title': '🏛️ Гарантия первого покупателя',
+    'acc3-body': 'Государственная программа позволяет купить жильё с первоначальным взносом всего <strong>5%</strong> без дорогой банковской страховки (экономия $10,000–$15,000). Обычно если взнос меньше 20%, банк требует эту страховку. Программа её убирает.',
+    'acc4-title': '🏦 Компенсационный счёт',
+    'acc4-body': 'Компенсационный счёт — это специальный банковский счёт, привязанный к ипотеке. Деньги на нём уменьшают сумму, на которую банк начисляет проценты. <strong>Пример:</strong> ипотека 200,000, на компенсационном счёте лежит 50,000 — проценты начисляются только на 150,000. При этом деньги остаются доступными в любой момент. Это ключевой инструмент нашей стратегии — пока я работаю, я агрессивно наполняю этот счёт и плачу меньше процентов.',
+
+    // Transfer
+    'transfer-banner': 'Этот раздел будет дополнен — информация уточняется',
+    'transfer-title': 'Перевод денег из России в Австралию',
+    'transfer-body': `
+      <p>Прямой банковский перевод из России в Австралию сейчас практически невозможен из-за санкций и ограничений. Поэтому используется посредник.</p>
+      <p><strong class="text-slate-800">Как это работает:</strong></p>
+      <ol class="list-decimal list-inside space-y-2 pl-1">
+        <li>Деньги передаются посреднику в России</li>
+        <li>Посредник организует перевод через промежуточные банки (скорее всего через Армению, Дубай или с использованием криптовалюты) и эквивалентная сумма в австралийских долларах поступает на мой счёт в Австралии</li>
+        <li>Комиссия посредника: от 3% до 7% от суммы перевода</li>
+      </ol>
+      <p><strong class="text-slate-800">Важно для австралийского банка и налоговой:</strong></p>
+      <ul class="list-disc list-inside space-y-1.5 pl-1">
+        <li>Подарки от родителей <strong>НЕ облагаются налогом</strong> в Австралии</li>
+        <li>Но нужно доказать происхождение средств</li>
+        <li>Потребуется: официальное заявление от родителей, подтверждение их накоплений, документальный след перевода</li>
+      </ul>
+      <p><strong class="text-slate-800">Риски:</strong></p>
+      <ul class="list-disc list-inside space-y-1.5 pl-1">
+        <li>Курсовые потери при конвертации валют</li>
+        <li>Комиссия посредника может оказаться выше ожидаемой</li>
+        <li>Процесс может занять от нескольких недель до <strong>3 месяцев</strong> — нужно начинать заранее</li>
+        <li>Необходимо тщательно выбирать посредника</li>
+      </ul>
+      <p><strong class="text-slate-800">Альтернативный вариант: наличные</strong></p>
+      <p>Ещё один способ — вывезти наличные в долларах США (до ~$100,000) и внести их на счёт в Австралии. В этом случае австралийский банк потребует письмо-объяснение: откуда взялись деньги, как они оказались у вас на руках. Потребуется официальное заявление (statutory declaration) с описанием источника средств — например, продажа имущества, накопления, подарок от родителей.</p>
+    `,
+
+    // Scenarios
+    'plan-title': 'Краткий план',
+    'plan-body': `
+      <div class="flex justify-between py-2.5 border-b border-slate-100 text-sm">
+        <span class="text-slate-500">Бюджет покупки</span>
+        <span class="font-semibold text-slate-800">$400,000–$500,000</span>
+      </div>
+      <div class="flex justify-between py-2.5 border-b border-slate-100 text-sm">
+        <span class="text-slate-500">Мой вклад</span>
+        <span class="font-semibold text-slate-800">$50,000–$60,000</span>
+      </div>
+      <div class="flex justify-between py-2.5 border-b border-slate-100 text-sm">
+        <span class="text-slate-500">Вклад родителей</span>
+        <span class="font-semibold text-slate-800">$100,000–$300,000</span>
+      </div>
+      <div class="flex justify-between py-2.5 border-b border-slate-100 text-sm">
+        <span class="text-slate-500">Гербовый сбор</span>
+        <span class="font-semibold text-emerald-600">$0 — льгота первого покупателя</span>
+      </div>
+      <div class="flex justify-between py-2.5 border-b border-slate-100 text-sm">
+        <span class="text-slate-500">Остаток</span>
+        <span class="font-semibold text-slate-800">Ипотечный кредит</span>
+      </div>
+      <div class="flex justify-between py-2.5 text-sm">
+        <span class="text-slate-500">Цель</span>
+        <span class="font-semibold text-slate-800">Аренда покрывает расходы</span>
+      </div>
+    `,
+    'scenarios-heading': 'Три сценария',
+    'sc-worst-title': 'Худший сценарий',
+    'sc-worst-body': `
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Перевод от родителей</span><span class="font-medium">$100,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Комиссия (5%)</span><span class="font-medium text-red-500">−$5,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Депозит</span><span class="font-medium">$141,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Ипотека</span><span class="font-medium">$309,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Ставка / Срок</span><span class="font-medium">6.5% / 10 лет</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Платёж/мес</span><span class="font-medium">$3,510</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Аренда/мес</span><span class="font-medium">$1,820</span></div>
+      <div class="border-t border-slate-100 pt-3 mt-1 space-y-1">
+        <div class="flex justify-between"><span class="font-semibold text-sm">Поток/мес</span><span class="font-bold text-red-500 text-sm">−$2,386</span></div>
+        <div class="flex justify-between"><span class="font-semibold text-sm">В рублях</span><span class="font-bold text-red-500 text-sm">−131,000 ₽/мес</span></div>
+      </div>
+    `,
+    'sc-real-title': 'Реалистичный сценарий',
+    'sc-real-body': `
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Перевод от родителей</span><span class="font-medium">$200,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Комиссия (5%)</span><span class="font-medium text-amber-500">−$10,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Депозит</span><span class="font-medium">$236,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Ипотека</span><span class="font-medium">$214,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Ставка / Срок</span><span class="font-medium">6.0% / 15 лет</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Платёж/мес</span><span class="font-medium">$1,806</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Аренда/мес</span><span class="font-medium">$1,820</span></div>
+      <div class="border-t border-slate-100 pt-3 mt-1 space-y-1">
+        <div class="flex justify-between"><span class="font-semibold text-sm">Поток/мес</span><span class="font-bold text-amber-500 text-sm">−$682</span></div>
+        <div class="flex justify-between"><span class="font-semibold text-sm">В рублях</span><span class="font-bold text-amber-500 text-sm">−37,500 ₽/мес</span></div>
+      </div>
+    `,
+    'sc-best-title': 'Лучший сценарий',
+    'sc-best-body': `
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Перевод от родителей</span><span class="font-medium">$300,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Комиссия (3%)</span><span class="font-medium text-emerald-600">−$9,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Депозит</span><span class="font-medium">$337,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Ипотека</span><span class="font-medium">$83,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Ставка / Срок</span><span class="font-medium">5.8% / 10 лет</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Платёж/мес</span><span class="font-medium">$916</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Аренда/мес</span><span class="font-medium">$1,700</span></div>
+      <div class="border-t border-slate-100 pt-3 mt-1 space-y-1">
+        <div class="flex justify-between"><span class="font-semibold text-sm">Поток/мес</span><span class="font-bold text-emerald-600 text-sm">+$98 ✓</span></div>
+        <div class="flex justify-between"><span class="font-semibold text-sm">В рублях</span><span class="font-bold text-emerald-600 text-sm">+5,400 ₽/мес</span></div>
+      </div>
+    `,
+
+    // Calculator
+    'calc-title':    'Интерактивный калькулятор',
+    'calc-subtitle': 'Настройте параметры и посмотрите на результат в реальном времени',
+    'sl1-label': 'Перевод от родителей',
+    'sl2-label': 'Комиссия за перевод',
+    'sl3-label': 'Цена квартиры',
+    'sl4-label': 'Мои сбережения',
+    'sl5-label': 'Процентная ставка',
+    'sl6-label': 'Срок кредита',
+    'sl7-label': 'Баланс компенсационного счёта',
+    'out1-label': 'Комиссия (потеря)',
+    'out2-label': 'Чистый депозит',
+    'out3-label': 'Ипотека',
+    'out4-label': 'Эффективная ипотека (с оффсетом)',
+    'out5-label': 'Ежемесячный платёж',
+    'out6-label': 'Аренда (оценка)',
+    'out7-label': 'Расходы в месяц',
+    'out8-label': 'Чистый поток',
+    'out9-label': 'В рублях',
+    'sl6-unit': ' лет',
+
+    // Verdict
+    'verdict-great':      'Самоокупаемость! Аренда покрывает все расходы.',
+    'verdict-ok':         'Примерно в ноль.',
+    'verdict-manageable': 'Нужна доплата, но терпимо.',
+    'verdict-bad':        'Высокий отрицательный поток. Пересмотри параметры.',
+
+    // Timeline
+    'tl-title': 'План по шагам',
+    'timeline-items': [
+      {
+        period: 'Апрель–Июнь 2026',
+        title: 'Подготовка',
+        color: 'bg-emerald-500',
+        items: [
+          'Перевод криптовалюты в наличные',
+          'Дополнительные взносы в пенсионный фонд для программы ФХСС ($11,500)',
+          'Поиск ипотечного брокера',
+          'Начало процесса перевода денег'
+        ]
+      },
+      {
+        period: 'Июль–Август 2026',
+        title: 'Одобрение',
+        color: 'bg-blue-500',
+        items: [
+          'Подача заявки на возврат средств из пенсионного фонда',
+          'Получение предварительного одобрения ипотеки',
+          'Осмотр квартир в Престоне и Норт Мельбурне'
+        ]
+      },
+      {
+        period: 'Сентябрь–Ноябрь 2026',
+        title: 'Покупка',
+        color: 'bg-violet-500',
+        items: [
+          'Получение средств из пенсионного фонда',
+          'Поступление денег от родителей',
+          'Покупка квартиры'
+        ]
+      },
+      {
+        period: 'Декабрь 2026 — Декабрь 2027',
+        title: 'Проживание',
+        color: 'bg-amber-500',
+        items: [
+          'Переезд в квартиру',
+          '12 месяцев проживания (требование для нулевого гербового сбора)',
+          'Активное наполнение компенсационного счёта'
+        ]
+      },
+      {
+        period: 'После 12 месяцев',
+        title: 'Свобода',
+        color: 'bg-emerald-600',
+        items: [
+          'Можно сдавать в аренду',
+          'Нанять управляющую компанию (8% от аренды)',
+          'Свободен уехать из Австралии'
+        ]
+      }
+    ],
+
+    // Footer
+    'footer-text': 'Последнее обновление: Апрель 2026 | Закрытый документ — только для семьи',
+  },
+
+  // ─────────────────────────────
+  // ENGLISH
+  // ─────────────────────────────
+  en: {
+    'pwd-title':    'Enter Password',
+    'pwd-subtitle': 'This page is password protected',
+    'pwd-btn-text': 'Login',
+    'pwd-error':    'Incorrect password',
+
+    'hero-badge': 'Private Project',
+    'hero-title': 'Investment Project:<br>Melbourne Property',
+    'hero-body': `
+      <p>Welcome! This is a private page for our property investment project.</p>
+      <p>I'm currently in a unique position. I work as a data scientist in Melbourne with a stable salary of ~$160,000/year — solid Australian middle class. I have a good credit history and strong chances of getting a mortgage on favorable terms. Not everyone has this opportunity — and we should take it.</p>
+      <p><strong class="text-white">Why now?</strong></p>
+      <p>Melbourne's apartment market is at an inflection point. Apartments barely grew in price for nearly 10 years — meaning they're currently undervalued. Meanwhile, the city's population is growing faster than anywhere in Australia (130,000 new residents/year), and new apartment construction is 4x below demand. Analysts forecast 7% apartment price growth in 2026 and up to 28% by 2030.</p>
+      <p><strong class="text-white">What does this mean long-term?</strong></p>
+      <p>We're purchasing an asset worth $400,000–$500,000 — nearly half a million dollars in capital. Once the mortgage is paid off, the apartment generates stable passive rental income of approximately $1,100–$1,800/month AUD. And the property value continues to grow.</p>
+      <p><strong class="text-white">Why Australia is a safe haven?</strong></p>
+      <p>Australia is one of the world's most stable economies — 30 years without a recession. A strong legal system protects property rights. The Australian dollar is a freely convertible currency. Property here is a safe haven for capital, especially given current geopolitical realities.</p>
+    `,
+
+    'suburbs-title': 'Why Preston and North Melbourne?',
+    'suburbs-intro': "We're not buying in the CBD or in a high-rise tower — those areas have oversupply and weak price growth. Instead, we're targeting northern middle-ring suburbs that are actively transforming.",
+    'suburb-preston': `
+      <p>📍 9km from CBD, excellent transport connections</p>
+      <p>🏘️ Epicenter of gentrification — rapidly transforming with new cafés, restaurants, young professionals moving in</p>
+      <p>🚇 Major infrastructure upgrades: 4 level crossings removed, 2 brand-new stations built</p>
+      <p>🏗️ Preston Market redevelopment: 1,200 new dwellings project reshaping the suburb</p>
+      <p>💰 2-bedroom apartments: $420,000–$535,000</p>
+      <p>📈 Rental yield: 4.7–4.9%</p>
+    `,
+    'suburb-northmelb': `
+      <p>📍 Just 3km from CBD</p>
+      <p>🚇 New Metro Tunnel station under construction — will dramatically boost the area's appeal</p>
+      <p>🎓 Near universities, hospitals, parks</p>
+      <p>📈 Growing rental demand from students and young professionals</p>
+    `,
+    'suburbs-also': '📍 Also considering: Reservoir (12km, most affordable) and Coburg (8km, tightest vacancy at 0.9%).',
+    'suburbs-principle-title': 'Property selection principle',
+    'suburbs-principle-body': "Older (1960s–1980s), brick, in small blocks of 4–12 units, with parking. NOT new build, NOT high-rise, NOT large complex. These apartments historically appreciate at 5.9–7.4% per year — significantly outperforming modern towers.",
+
+    'market-title':    'How the Australian Market Works',
+    'market-subtitle': 'Key concepts to understand before investing',
+    'acc1-title': '🏠 Property Types',
+    'acc1-body': "In Australia, the main property types are houses, townhouses, and apartments. For our budget, we're looking at 2-bedroom apartments. Apartments have annual strata fees covering building maintenance: $3,000–$7,000 per year. The smaller and simpler the building, the lower the fees. Older brick buildings without lifts and pools cost the least.",
+    'acc2-title': '💸 Stamp Duty & First Buyer Benefits',
+    'acc2-body': "Stamp duty is a government tax on purchases — normally tens of thousands of dollars. But as a first-time buyer in Australia, properties under $600,000 have <strong>ZERO stamp duty</strong>. Savings: $15,000–$25,000. Condition: must live in the property for 12 months as primary residence.",
+    'acc3-title': '🏛️ First Home Guarantee',
+    'acc3-body': "A government scheme lets you buy with just <strong>5% deposit</strong> without expensive lender's mortgage insurance (saving $10,000–$15,000). Normally if the deposit is under 20%, the bank requires this insurance. The scheme eliminates it.",
+    'acc4-title': '🏦 Offset Account',
+    'acc4-body': "An offset account is a special bank account linked to your mortgage. Money in it reduces the balance on which the bank charges interest. <strong>Example:</strong> $200,000 mortgage, $50,000 in offset — interest is only charged on $150,000. The money remains accessible anytime. This is a key tool in our strategy — while I'm working, I aggressively fund this account and pay less interest.",
+
+    'transfer-banner': 'This section will be expanded — information is being refined',
+    'transfer-title': 'Money Transfer from Russia to Australia',
+    'transfer-body': `
+      <p>Direct bank transfers from Russia to Australia are currently nearly impossible due to sanctions and restrictions. An intermediary is used instead.</p>
+      <p><strong class="text-slate-800">How it works:</strong></p>
+      <ol class="list-decimal list-inside space-y-2 pl-1">
+        <li>Funds are given to an intermediary in Russia</li>
+        <li>The intermediary arranges transfer through intermediate banks (likely via Armenia, Dubai, or using cryptocurrency) and the equivalent amount in AUD arrives in my Australian bank account</li>
+        <li>Intermediary commission: 3% to 7% of the transfer amount</li>
+      </ol>
+      <p><strong class="text-slate-800">Important for the Australian bank and tax office (ATO):</strong></p>
+      <ul class="list-disc list-inside space-y-1.5 pl-1">
+        <li>Gifts from parents are <strong>NOT taxed</strong> in Australia</li>
+        <li>But the source of funds must be proven</li>
+        <li>Required: statutory declaration from parents, proof of their savings, documented transfer trail</li>
+      </ul>
+      <p><strong class="text-slate-800">Risks:</strong></p>
+      <ul class="list-disc list-inside space-y-1.5 pl-1">
+        <li>Currency conversion losses</li>
+        <li>Intermediary commission may be higher than expected</li>
+        <li>Process can take anywhere from a few weeks to <strong>3 months</strong> — start early</li>
+        <li>The intermediary must be chosen carefully</li>
+      </ul>
+      <p><strong class="text-slate-800">Alternative: physical cash</strong></p>
+      <p>Another option is to bring physical USD cash (~$100,000) and deposit it into an Australian bank account. The bank will require a letter of explanation — how the money came into your possession. A statutory declaration is needed, describing the source of funds (e.g. sale of property, savings, gift from parents).</p>
+    `,
+
+    'plan-title': 'Plan Summary',
+    'plan-body': `
+      <div class="flex justify-between py-2.5 border-b border-slate-100 text-sm">
+        <span class="text-slate-500">Purchase budget</span>
+        <span class="font-semibold text-slate-800">$400,000–$500,000</span>
+      </div>
+      <div class="flex justify-between py-2.5 border-b border-slate-100 text-sm">
+        <span class="text-slate-500">My contribution</span>
+        <span class="font-semibold text-slate-800">$50,000–$60,000</span>
+      </div>
+      <div class="flex justify-between py-2.5 border-b border-slate-100 text-sm">
+        <span class="text-slate-500">Parents' contribution</span>
+        <span class="font-semibold text-slate-800">$100,000–$300,000</span>
+      </div>
+      <div class="flex justify-between py-2.5 border-b border-slate-100 text-sm">
+        <span class="text-slate-500">Stamp duty</span>
+        <span class="font-semibold text-emerald-600">$0 — first home buyer exemption</span>
+      </div>
+      <div class="flex justify-between py-2.5 border-b border-slate-100 text-sm">
+        <span class="text-slate-500">Remainder</span>
+        <span class="font-semibold text-slate-800">Mortgage</span>
+      </div>
+      <div class="flex justify-between py-2.5 text-sm">
+        <span class="text-slate-500">Goal</span>
+        <span class="font-semibold text-slate-800">Rent covers expenses</span>
+      </div>
+    `,
+    'scenarios-heading': 'Three Scenarios',
+    'sc-worst-title': 'Worst Case',
+    'sc-worst-body': `
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Parents transfer</span><span class="font-medium">$100,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Fee (5%)</span><span class="font-medium text-red-500">−$5,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Deposit</span><span class="font-medium">$141,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Mortgage</span><span class="font-medium">$309,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Rate / Term</span><span class="font-medium">6.5% / 10 yrs</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Monthly payment</span><span class="font-medium">$3,510</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Monthly rent</span><span class="font-medium">$1,820</span></div>
+      <div class="border-t border-slate-100 pt-3 mt-1 space-y-1">
+        <div class="flex justify-between"><span class="font-semibold text-sm">Cash flow</span><span class="font-bold text-red-500 text-sm">−$2,386/mo</span></div>
+        <div class="flex justify-between"><span class="font-semibold text-sm">In rubles</span><span class="font-bold text-red-500 text-sm">−131,000 ₽/mo</span></div>
+      </div>
+    `,
+    'sc-real-title': 'Realistic Scenario',
+    'sc-real-body': `
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Parents transfer</span><span class="font-medium">$200,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Fee (5%)</span><span class="font-medium text-amber-500">−$10,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Deposit</span><span class="font-medium">$236,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Mortgage</span><span class="font-medium">$214,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Rate / Term</span><span class="font-medium">6.0% / 15 yrs</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Monthly payment</span><span class="font-medium">$1,806</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Monthly rent</span><span class="font-medium">$1,820</span></div>
+      <div class="border-t border-slate-100 pt-3 mt-1 space-y-1">
+        <div class="flex justify-between"><span class="font-semibold text-sm">Cash flow</span><span class="font-bold text-amber-500 text-sm">−$682/mo</span></div>
+        <div class="flex justify-between"><span class="font-semibold text-sm">In rubles</span><span class="font-bold text-amber-500 text-sm">−37,500 ₽/mo</span></div>
+      </div>
+    `,
+    'sc-best-title': 'Best Case',
+    'sc-best-body': `
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Parents transfer</span><span class="font-medium">$300,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Fee (3%)</span><span class="font-medium text-emerald-600">−$9,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Deposit</span><span class="font-medium">$337,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Mortgage</span><span class="font-medium">$83,000</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Rate / Term</span><span class="font-medium">5.8% / 10 yrs</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Monthly payment</span><span class="font-medium">$916</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Monthly rent</span><span class="font-medium">$1,700</span></div>
+      <div class="border-t border-slate-100 pt-3 mt-1 space-y-1">
+        <div class="flex justify-between"><span class="font-semibold text-sm">Cash flow</span><span class="font-bold text-emerald-600 text-sm">+$98/mo ✓</span></div>
+        <div class="flex justify-between"><span class="font-semibold text-sm">In rubles</span><span class="font-bold text-emerald-600 text-sm">+5,400 ₽/mo</span></div>
+      </div>
+    `,
+
+    'calc-title':    'Interactive Calculator',
+    'calc-subtitle': 'Adjust the parameters and see results in real time',
+    'sl1-label': "Parents' transfer",
+    'sl2-label': 'Transfer fee',
+    'sl3-label': 'Property price',
+    'sl4-label': 'My savings',
+    'sl5-label': 'Interest rate',
+    'sl6-label': 'Loan term',
+    'sl7-label': 'Offset account balance',
+    'out1-label': 'Transfer fee (lost)',
+    'out2-label': 'Net deposit',
+    'out3-label': 'Mortgage',
+    'out4-label': 'Effective mortgage (after offset)',
+    'out5-label': 'Monthly repayment',
+    'out6-label': 'Estimated rent/month',
+    'out7-label': 'Monthly expenses',
+    'out8-label': 'Net cash flow',
+    'out9-label': 'In rubles',
+    'sl6-unit': ' yrs',
+
+    'verdict-great':      'Self-sustaining! Rent covers all costs.',
+    'verdict-ok':         'Roughly break-even.',
+    'verdict-manageable': 'Subsidy needed, but manageable.',
+    'verdict-bad':        'High negative cash flow. Reconsider parameters.',
+
+    'tl-title': 'Step-by-Step Plan',
+    'timeline-items': [
+      {
+        period: 'April–June 2026',
+        title: 'Preparation',
+        color: 'bg-emerald-500',
+        items: [
+          'Convert cryptocurrency to cash',
+          'Additional super contributions for FHSS scheme ($11,500)',
+          'Find a mortgage broker',
+          'Begin money transfer process'
+        ]
+      },
+      {
+        period: 'July–August 2026',
+        title: 'Approvals',
+        color: 'bg-blue-500',
+        items: [
+          'Apply for FHSS super withdrawal',
+          'Get mortgage pre-approval',
+          'Inspect apartments in Preston and North Melbourne'
+        ]
+      },
+      {
+        period: 'September–November 2026',
+        title: 'Purchase',
+        color: 'bg-violet-500',
+        items: [
+          'Receive FHSS funds',
+          "Receive parents' transfer",
+          'Buy the apartment'
+        ]
+      },
+      {
+        period: 'December 2026 — December 2027',
+        title: 'Living in',
+        color: 'bg-amber-500',
+        items: [
+          'Move into the apartment',
+          '12 months of residency (required for zero stamp duty)',
+          'Aggressively fund the offset account'
+        ]
+      },
+      {
+        period: 'After 12 months',
+        title: 'Freedom',
+        color: 'bg-emerald-600',
+        items: [
+          'Can rent it out',
+          'Hire property manager (8% of rent)',
+          'Free to leave Australia'
+        ]
+      }
+    ],
+
+    'footer-text': 'Last updated: April 2026 | Private document — family only',
+  }
+};
+
+// ══════════════════════════════════════════════════════════
+// LANGUAGE SYSTEM
+// ══════════════════════════════════════════════════════════
+
+let currentLang = 'ru';
+
+function setLang(lang) {
+  currentLang = lang;
+  const active   = 'px-3 py-1.5 rounded-full text-sm font-bold transition-all bg-emerald-500 text-white';
+  const inactive = 'px-3 py-1.5 rounded-full text-sm font-bold transition-all text-slate-500 hover:text-slate-800';
+  document.getElementById('btn-ru').className = lang === 'ru' ? active : inactive;
+  document.getElementById('btn-en').className = lang === 'en' ? active : inactive;
+  applyLang(lang);
+  buildTimeline(lang);
+  updateCalc();
+}
+
+function applyLang(lang) {
+  const t = i18n[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (key && typeof t[key] === 'string') {
+      el.innerHTML = t[key];
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// PASSWORD
+// ══════════════════════════════════════════════════════════
+
+// SHA-256 of "melbourne2026"
+const CORRECT_HASH = '9aa47eb34525820a8976c90eb2e2ae261cdfb0e1a58be5dbc146414500adfdc4';
+
+async function sha256(msg) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function checkPassword() {
+  const val = document.getElementById('pwd-input').value;
+  const hash = await sha256(val);
+  if (hash === CORRECT_HASH) {
+    sessionStorage.setItem('auth', '1');
+    document.getElementById('pwd-overlay').style.display = 'none';
+    document.getElementById('main').classList.remove('hidden');
+    buildTimeline(currentLang);
+    updateCalc();
+    setTimeout(initObserver, 120);
+  } else {
+    const errEl  = document.getElementById('pwd-error');
+    const inputEl = document.getElementById('pwd-input');
+    errEl.classList.remove('hidden');
+    inputEl.classList.add('ring-2', 'ring-red-300', 'border-red-300');
+    setTimeout(() => {
+      errEl.classList.add('hidden');
+      inputEl.classList.remove('ring-2', 'ring-red-300', 'border-red-300');
+    }, 3000);
+  }
+}
+
+document.getElementById('pwd-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkPassword();
+});
+
+// ══════════════════════════════════════════════════════════
+// ACCORDION
+// ══════════════════════════════════════════════════════════
+
+function toggleAccordion(id) {
+  const content = document.getElementById(id);
+  const icon    = document.getElementById(id + '-icon');
+  const isOpen  = content.classList.contains('open');
+
+  document.querySelectorAll('.accordion-content').forEach(el => el.classList.remove('open'));
+  document.querySelectorAll('.accordion-icon').forEach(el => el.classList.remove('rotated'));
+
+  if (!isOpen) {
+    content.classList.add('open');
+    icon.classList.add('rotated');
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// TIMELINE
+// ══════════════════════════════════════════════════════════
+
+function buildTimeline(lang) {
+  const items     = i18n[lang]['timeline-items'];
+  const container = document.getElementById('timeline-items');
+  if (!container) return;
+  container.innerHTML = '';
+  items.forEach((item, idx) => {
+    const div = document.createElement('div');
+    div.className = 'relative pl-14';
+    div.innerHTML = `
+      <div class="absolute left-0 top-1 w-10 h-10 rounded-full ${item.color} flex items-center justify-center
+                  text-white font-bold text-sm shadow-md ring-4 ring-white">
+        ${idx + 1}
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <span class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">${item.period}</span>
+        <h4 class="font-bold text-slate-900 text-base mt-1 mb-3">${item.title}</h4>
+        <ul class="space-y-2">
+          ${item.items.map(t => `
+            <li class="flex items-start gap-2 text-sm text-slate-600">
+              <span class="text-emerald-500 mt-0.5 flex-shrink-0 font-bold">✓</span>
+              <span>${t}</span>
+            </li>`).join('')}
+        </ul>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// CALCULATOR
+// ══════════════════════════════════════════════════════════
+
+function fmt(n) {
+  return '$' + Math.round(n).toLocaleString('en-AU');
+}
+
+function fmtRub(n) {
+  const sign = n >= 0 ? '+' : '−';
+  return sign + Math.abs(Math.round(n)).toLocaleString('en-AU') + ' ₽';
+}
+
+function fmtFlow(n) {
+  const sign = n >= 0 ? '+' : '−';
+  return sign + '$' + Math.abs(Math.round(n)).toLocaleString('en-AU');
+}
+
+function calcMonthly(principal, annualRatePct, years) {
+  if (principal <= 0) return 0;
+  const r = annualRatePct / 100 / 12;
+  const n = years * 12;
+  if (r === 0) return principal / n;
+  return principal * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+}
+
+function updateCalc() {
+  const parents  = +document.getElementById('sl1').value;
+  const feePct   = +document.getElementById('sl2').value;
+  const price    = +document.getElementById('sl3').value;
+  const savings  = +document.getElementById('sl4').value;
+  const rate     = +document.getElementById('sl5').value;
+  const years    = +document.getElementById('sl6').value;
+  const offset   = +document.getElementById('sl7').value;
+
+  const t = i18n[currentLang];
+
+  // Slider display values
+  document.getElementById('sl1-val').textContent = fmt(parents);
+  document.getElementById('sl2-val').textContent = feePct.toFixed(1) + '%';
+  document.getElementById('sl3-val').textContent = fmt(price);
+  document.getElementById('sl4-val').textContent = fmt(savings);
+  document.getElementById('sl5-val').textContent = rate.toFixed(1) + '%';
+  document.getElementById('sl6-val').textContent = years + t['sl6-unit'];
+  document.getElementById('sl7-val').textContent = fmt(offset);
+
+  // Computations
+  const fee             = parents * feePct / 100;
+  const netDeposit      = Math.max(0, (parents - fee) + savings - 4000);
+  const mortgage        = Math.max(0, price - netDeposit);
+  const effectiveMort   = Math.max(0, mortgage - offset);
+  const repayment       = calcMonthly(effectiveMort, rate, years);
+  const estimatedRent   = price * 0.038 / 12;
+  const propMgmt        = estimatedRent * 0.08;
+  const expenses        = repayment + 550 + propMgmt;
+  const cashFlow        = estimatedRent - expenses;
+  const cashFlowRub     = cashFlow * 55;
+
+  // Output values
+  document.getElementById('out1').textContent = fmt(fee);
+  document.getElementById('out2').textContent = fmt(netDeposit);
+  document.getElementById('out3').textContent = fmt(mortgage);
+  document.getElementById('out4').textContent = fmt(effectiveMort);
+  document.getElementById('out5').textContent = fmt(repayment);
+  document.getElementById('out6').textContent = fmt(estimatedRent);
+  document.getElementById('out7').textContent = fmt(expenses);
+
+  const flowEl = document.getElementById('out8');
+  const rubEl  = document.getElementById('out9');
+  flowEl.textContent = fmtFlow(cashFlow);
+  rubEl.textContent  = fmtRub(cashFlowRub);
+
+  // Color cash flow outputs
+  let colorClass, borderClass, textClass, verdictKey;
+  if (cashFlow > 100) {
+    colorClass  = 'text-emerald-600';
+    borderClass = 'border-emerald-500';
+    textClass   = 'text-emerald-700';
+    verdictKey  = 'verdict-great';
+  } else if (cashFlow >= -200) {
+    colorClass  = 'text-amber-500';
+    borderClass = 'border-amber-400';
+    textClass   = 'text-amber-700';
+    verdictKey  = 'verdict-ok';
+  } else if (cashFlow >= -800) {
+    colorClass  = 'text-amber-600';
+    borderClass = 'border-amber-400';
+    textClass   = 'text-amber-700';
+    verdictKey  = 'verdict-manageable';
+  } else {
+    colorClass  = 'text-red-500';
+    borderClass = 'border-red-500';
+    textClass   = 'text-red-700';
+    verdictKey  = 'verdict-bad';
+  }
+
+  flowEl.className = `text-xl font-extrabold tabular-nums ${colorClass}`;
+  rubEl.className  = `text-xl font-extrabold tabular-nums ${colorClass}`;
+
+  const verdictBox  = document.getElementById('verdict-box');
+  const verdictText = document.getElementById('verdict-text');
+  verdictBox.className  = `rounded-2xl p-6 text-center border-l-4 bg-slate-50 ${borderClass}`;
+  verdictText.className = `font-semibold text-lg ${textClass}`;
+  verdictText.textContent = t[verdictKey];
+}
+
+// ══════════════════════════════════════════════════════════
+// INTERSECTION OBSERVER
+// ══════════════════════════════════════════════════════════
+
+function initObserver() {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+
+applyLang('ru');
+
+if (sessionStorage.getItem('auth') === '1') {
+  document.getElementById('pwd-overlay').style.display = 'none';
+  document.getElementById('main').classList.remove('hidden');
+  buildTimeline('ru');
+  updateCalc();
+  setTimeout(initObserver, 120);
+}
+</script>
+</body>
+</html>
